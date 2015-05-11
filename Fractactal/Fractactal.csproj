@@ -25,6 +25,7 @@
     <Content Include="app.css" />
     <Content Include="index.html" />
     <Content Include="web.config" />
+    <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
