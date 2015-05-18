@@ -73,7 +73,8 @@ window.onload = function () {
             svg.removeChild(svg.firstChild);
         }
         var val = ev.target.value;
-        window.history.pushState(null, null, "/?depth=" + val);
+        var prefix = window.location.search.split("?")[0];
+        window.history.pushState(null, null, "" + prefix + "?depth=" + val);
         inputRange.value = val;
         inputNumber.value = val;
         new Square(0, 0, 800, 0).draw(svg, +val);
