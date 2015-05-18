@@ -65,16 +65,28 @@ var Square = (function () {
     return Square;
 })();
 window.onload = function () {
-    var query = window.location.search;
-    var depth = +query.split("depth=")[1];
-    if (depth) {
-        var input = document.getElementById("depth");
-        input.value = "" + depth;
-    }
-    else {
-        depth = 3;
-    }
     var svg = document.getElementById('svg');
-    new Square(0, 0, 800, 0).draw(svg, depth);
+    var inputRange = document.getElementById("depthRange");
+    var inputNumber = document.getElementById("depthNumber");
+    var change = function (ev) {
+        while (svg.firstChild) {
+            svg.removeChild(svg.firstChild);
+        }
+        var val = ev.target.value;
+        window.history.pushState(null, null, "/?depth=" + val);
+        inputRange.value = val;
+        inputNumber.value = val;
+        new Square(0, 0, 800, 0).draw(svg, +val);
+    };
+    inputRange.onchange = change;
+    inputNumber.onchange = change;
+    inputRange.oninput = function () {
+        inputNumber.value = inputRange.value;
+    };
+    inputNumber.oninput = function () {
+        inputRange.value = inputNumber.value;
+    };
+    var depth = +window.location.search.split("depth=")[1];
+    change({ target: { value: depth || 3 } });
 };
 //# sourceMappingURL=app.js.map
