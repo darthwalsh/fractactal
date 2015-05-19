@@ -9,10 +9,27 @@
     <script src="app.js"></script>
 </head>
 <body>
-    <svg id="svg" height="850" width="850"></svg><br>
+    <div>
+        <input type="button" id="DisplayButton" value="Display" />
+        <input type="button" id="Shape0" value="First Shape" />
+    </div>
 
-    Depth:
-    <input type="number" name="depthNumber" id="depthNumber" min="1" max="13" value="3" />
-    <input type="range" name="depthRange" id="depthRange" min="1" max="13" value="3" />
+    <div id="displayControls">
+        Depth: <input type="number" id="depthNumber" min="1" max="9" value="3" />
+        <input type="range" id="depthRange" min="1" max="9" value="3" />
+        <br />
+    </div>
+
+    <div id="makeControls" style="display:none;">
+        Name: <input type="text" id="makeName" />
+        <input type="button" id="addSegment" value="Add Edge"/>
+        <input type="button" id="removeSegment" value="Remove Edge" />
+        <br />
+        <div id="edges">
+            <br />
+        </div>
+    </div>
+
+    <svg id="svg" height="850" width="850"></svg><br>
 </body>
 </html>
