@@ -4,6 +4,13 @@ interface Drawable {
     draw(svg: SVGSVGElement, depth: number);
 }
 
+function point(x: number, y: number, svg: SVGSVGElement): SVGPoint {
+    var p = svg.createSVGPoint();
+    p.x = x;
+    p.y = y;
+    return p;
+}
+
 class Triangle implements Drawable {
     constructor(private x: number, private y: number, private side: number, private rot: number) {
     }
@@ -20,20 +27,9 @@ class Triangle implements Drawable {
 
         var tri: SVGPolygonElement = <SVGPolygonElement>document.createElementNS(svgns, 'polygon');
 
-        var p = svg.createSVGPoint();
-        p.x = this.x;
-        p.y = this.y;
-        tri.points.appendItem(p);
-
-        p = svg.createSVGPoint();
-        p.x = this.x + this.side;
-        p.y = this.y;
-        tri.points.appendItem(p);
-
-        p = svg.createSVGPoint();
-        p.x = this.x;
-        p.y = this.y + this.side;
-        tri.points.appendItem(p);
+        tri.points.appendItem(point(this.x,             this.y,             svg));
+        tri.points.appendItem(point(this.x + this.side, this.y,             svg));
+        tri.points.appendItem(point(this.x,             this.y + this.side, svg));
 
         var transform = svg.createSVGTransform();
         transform.setRotate(this.rot * 180 / Math.PI, this.x, this.y);
@@ -138,20 +134,14 @@ function drawMake() {
 
     var box = document.getElementById("edges").firstElementChild;
 
-    var p = svg.createSVGPoint();
-    p.x = 5;
-    p.y = 5;
-    line.points.appendItem(p);
+    line.points.appendItem(point(5, 5, svg));
 
     var x = 5 + +(<HTMLInputElement>box).value;
     var y = 5;
     var angle = 0;
     box = box.nextElementSibling;
 
-    var p = svg.createSVGPoint();
-    p.x = x;
-    p.y = y;
-    line.points.appendItem(p);
+    line.points.appendItem(point(x, y, svg));
 
     for (; (<HTMLInputElement>box).value; box = box.nextElementSibling.nextElementSibling) {
         angle += Math.PI * +(<HTMLInputElement>box).value / 180;
@@ -160,10 +150,7 @@ function drawMake() {
         x += length * Math.cos(angle);
         y += length * Math.sin(angle);
 
-        var p = svg.createSVGPoint();
-        p.x = x;
-        p.y = y;
-        line.points.appendItem(p);
+        line.points.appendItem(point(x, y, svg));
     }
     
     line.style.fillOpacity = "0";
