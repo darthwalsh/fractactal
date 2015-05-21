@@ -125,34 +125,24 @@ function drawEv(ev: any) {
     drawSize(ev.target.value)
 }
 
-function drawMake() {
+function drawTurns(x: number, y: number, ps: { length: number; turn: number }[]) {
     clearSvg();
 
     var svg: SVGSVGElement = <SVGSVGElement><any>document.getElementById('svg');
-    
     var line: SVGPolylineElement = <SVGPolylineElement>document.createElementNS(svgns, 'polyline');
-
-    var box = document.getElementById("edges").firstElementChild;
-
-    line.points.appendItem(point(5, 5, svg));
-
-    var x = 5 + +(<HTMLInputElement>box).value;
-    var y = 5;
-    var angle = 0;
-    box = box.nextElementSibling;
 
     line.points.appendItem(point(x, y, svg));
 
-    for (; (<HTMLInputElement>box).value; box = box.nextElementSibling.nextElementSibling) {
-        angle += Math.PI * +(<HTMLInputElement>box).value / 180;
-        var length = +(<HTMLInputElement>box.nextElementSibling).value;
-
-        x += length * Math.cos(angle);
-        y += length * Math.sin(angle);
+    var angle = 0;
+    
+    for (var i = 0; i < ps.length; ++i) {
+        angle += Math.PI * ps[i].turn / 180;
+        x += ps[i].length * Math.cos(angle);
+        y += ps[i].length * Math.sin(angle);
 
         line.points.appendItem(point(x, y, svg));
     }
-    
+
     line.style.fillOpacity = "0";
     line.style.stroke = Math.abs(x - 5) < 0.001 && Math.abs(y - 5) < 0.001 ? "green" : "red";
     line.style.strokeLinecap = "round";
@@ -164,6 +154,19 @@ function drawMake() {
     line.transform.baseVal.appendItem(transform);
 
     svg.appendChild(line);
+}
+
+function drawMake() {
+    var box = document.getElementById("edges").firstElementChild;
+
+    var ps = [{ length: +(<HTMLInputElement>box).value, turn: 0 }];
+
+    box = box.nextElementSibling;
+    for (; (<HTMLInputElement>box).value; box = box.nextElementSibling.nextElementSibling) {
+        ps.push({ length: +(<HTMLInputElement>box.nextElementSibling).value, turn: +(<HTMLInputElement>box).value });
+    }
+    
+    drawTurns(5, 5, ps);
 }
 
 window.onload = () => {
