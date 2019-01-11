@@ -125,18 +125,41 @@ function drawEv(ev: any) {
     drawSize(ev.target.value)
 }
 
-function drawTurns(x: number, y: number, ps: { length: number; turn: number }[]) {
-    clearSvg();
-
+function drawTurns(tx: number, ty: number, ps: { length: number; turn: number; label?: string }[]) {
     var svg: SVGSVGElement = <SVGSVGElement><any>document.getElementById('svg');
     var line: SVGPolylineElement = <SVGPolylineElement>document.createElementNS(svgns, 'polyline');
+
+    var scaleT = svg.createSVGTransform();
+    scaleT.setScale(10, 10);
+
+    var translateT = svg.createSVGTransform();
+    translateT.setTranslate(tx, ty);
+
+    var x = 0;
+    var y = 0;
 
     line.points.appendItem(point(x, y, svg));
 
     var angle = 0;
     
     for (var i = 0; i < ps.length; ++i) {
+        var oldAngle = angle;
+
         angle += Math.PI * ps[i].turn / 180;
+
+        if (ps[i].label) {
+            var text: SVGTextElement = <SVGTextElement>document.createElementNS(svgns, 'text');
+            text.setAttribute('x', "" + x);
+            text.setAttribute('y', "" + y);
+            text.textContent = ps[i].label;
+            text.style.fill = "black";
+            text.style.fontSize = "12";
+            text.transform.baseVal.appendItem(scaleT);
+            text.transform.baseVal.appendItem(translateT);
+            svg.appendChild(text);
+        }
+
+
         x += ps[i].length * Math.cos(angle);
         y += ps[i].length * Math.sin(angle);
 
@@ -144,26 +167,27 @@ function drawTurns(x: number, y: number, ps: { length: number; turn: number }[])
     }
 
     line.style.fillOpacity = "0";
-    line.style.stroke = Math.abs(x - 5) < 0.001 && Math.abs(y - 5) < 0.001 ? "green" : "red";
+    line.style.stroke = Math.abs(x) < 0.001 && Math.abs(y) < 0.001 ? "green" : "red";
     line.style.strokeLinecap = "round";
     line.style.strokeLinejoin = "round";
     line.style.strokeWidth = "0.5";
 
-    var transform = svg.createSVGTransform();
-    transform.setScale(10, 10);
-    line.transform.baseVal.appendItem(transform);
+    line.transform.baseVal.appendItem(scaleT);
+    line.transform.baseVal.appendItem(translateT);
 
     svg.appendChild(line);
 }
 
 function drawMake() {
+    clearSvg();
+
     var box = document.getElementById("edges").firstElementChild;
 
     var ps = [{ length: +(<HTMLInputElement>box).value, turn: 0 }];
 
     box = box.nextElementSibling;
     for (; (<HTMLInputElement>box).value; box = box.nextElementSibling.nextElementSibling) {
-        ps.push({ length: +(<HTMLInputElement>box.nextElementSibling).value, turn: +(<HTMLInputElement>box).value });
+        ps.push({ length: +(<HTMLInputElement>box.nextElementSibling).value, turn: +(<HTMLInputElement>box).value, label: "A" });
     }
     
     drawTurns(5, 5, ps);
@@ -210,12 +234,6 @@ window.onload = () => {
     }
 
     var edges = document.getElementById("edges");
-    var box = edges.firstElementChild;
-    for (; (<HTMLInputElement>box).value; box = box.nextElementSibling) {
-        (<HTMLElement>box).oninput = () => {
-            drawMake();
-        };
-    }
 
     var addEdgeLength = () => {
         var input = document.createElement("input");
@@ -259,9 +277,40 @@ window.onload = () => {
         drawMake();
     };
 
+    var subShapes = document.getElementById("subShapes");
+
+    var addSubShapes = () => {
+        var input = document.createElement("input");
+        input.type = "text";
+        input.oninput = drawMake;
+
+        subShapes.appendChild(document.createTextNode("Sub Shape: "));
+        subShapes.appendChild(input);
+        subShapes.appendChild(document.createElement("br"));
+    };
+
+    var removeSubShapes = () => {
+        if (!subShapes.lastChild) {
+            return;
+        }
+
+        subShapes.removeChild(subShapes.lastChild);
+        subShapes.removeChild(subShapes.lastChild);
+        subShapes.removeChild(subShapes.lastChild);
+        
+        drawMake();
+    };
+
+    document.getElementById("addSubShape").onclick = addSubShapes;
+    document.getElementById("removeSubShape").onclick = removeSubShapes;
+
     addEdgeLength();
     addEdgeTurn();
     addEdgeLength();
     addEdgeTurn();
     addEdgeLength();
+
+    if (window.location.host.indexOf("localhost") != -1) {
+        shape.onclick(null);
+    }
 };
